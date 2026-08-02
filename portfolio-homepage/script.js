@@ -33,51 +33,57 @@ const defaults = {
 
 let currentContent = { ...defaults };
 
-// 1. 초기 기본 콘텐츠 적용
-applyContent(defaults);
+// 1. LocalStorage 우선 로드
+try {
+  const local = localStorage.getItem('site_content_main');
+  if (local) {
+    currentContent = { ...defaults, ...JSON.parse(local) };
+    applyContent(currentContent);
+  }
+} catch (e) {}
 
-// 2. Supabase에서 최신 데이터 불러와서 적용
+// 2. Supabase 서버 최신 로드 및 동기화
 try {
   const { data, error } = await supabase.from('site_content').select('content').eq('id', 'main').maybeSingle();
   if (!error && data?.content) {
     currentContent = { ...defaults, ...data.content };
+    localStorage.setItem('site_content_main', JSON.stringify(currentContent));
     applyContent(currentContent);
   }
-} catch (err) {
-  console.log('Supabase fetch error:', err);
-}
+} catch (err) {}
 
 function applyContent(content) {
   [['heroTitle','heroTitle'],['heroIntro','heroIntro'],['aboutTitle','aboutTitle'],['aboutText','aboutText']].forEach(([key,id]) => {
-    if (content[key] && document.querySelector('#' + id)) {
-      document.querySelector('#' + id).innerHTML = content[key].replaceAll('
+    const el = document.querySelector('#' + id);
+    if (content[key] && el) {
+      el.innerHTML = content[key].replaceAll('
 ','<br>');
     }
   });
   const mail = document.querySelector('#contactEmail');
-  if (mail) {
+  if (mail && content.email) {
     mail.href = 'mailto:' + content.email;
     mail.innerHTML = content.email + ' <span>&nearr;</span>';
   }
-  document.documentElement.style.setProperty('--hero-size', content.heroSize + 'px');
-  document.documentElement.style.setProperty('--about-size', content.aboutSize + 'px');
-  document.documentElement.style.setProperty('--hero-bg', content.heroBg);
-  document.documentElement.style.setProperty('--contact-bg', content.contactBg);
-  
+  if (content.heroSize) document.documentElement.style.setProperty('--hero-size', content.heroSize + 'px');
+  if (content.aboutSize) document.documentElement.style.setProperty('--about-size', content.aboutSize + 'px');
+  if (content.heroBg) document.documentElement.style.setProperty('--hero-bg', content.heroBg);
+  if (content.contactBg) document.documentElement.style.setProperty('--contact-bg', content.contactBg);
+
   for (let i = 0; i < 3; i++) {
     const art = document.querySelector('#projectArt' + i);
-    if (art) {
-      document.querySelector('#projectTitle' + i).textContent = content['projectTitle' + i];
-      document.querySelector('#projectDetail' + i).textContent = content['projectDetail' + i];
-      if (content['projectImage' + i]) {
-        art.style.background = 'center / cover no-repeat url(' + content['projectImage' + i] + ')';
-        art.querySelectorAll('.shape, span').forEach(node => node.style.display = 'none');
-      }
+    const titleEl = document.querySelector('#projectTitle' + i);
+    const detailEl = document.querySelector('#projectDetail' + i);
+    if (titleEl && content['projectTitle' + i]) titleEl.textContent = content['projectTitle' + i];
+    if (detailEl && content['projectDetail' + i]) detailEl.textContent = content['projectDetail' + i];
+
+    if (art && content['projectImage' + i]) {
+      art.style.background = 'center / cover no-repeat url(' + content['projectImage' + i] + ')';
+      art.querySelectorAll('.shape, span').forEach(node => node.style.display = 'none');
     }
   }
 }
 
-// 3. 모달 팝업 열기 함수
 function openModal(index) {
   const detailModal = document.querySelector('#detailModal');
   if (!detailModal) return;
@@ -87,12 +93,16 @@ function openModal(index) {
   const desc = currentContent['projectDesc' + index] || '상세 설명이 준비되어 있습니다.';
   const image = currentContent['projectImage' + index];
 
-  document.querySelector('#modalTitle').textContent = title;
-  document.querySelector('#modalDetail').textContent = detail;
-  document.querySelector('#modalDesc').innerHTML = desc.replaceAll('
+  const modalTitle = document.querySelector('#modalTitle');
+  const modalDetail = document.querySelector('#modalDetail');
+  const modalDesc = document.querySelector('#modalDesc');
+  const modalArt = document.querySelector('#modalArt');
+
+  if (modalTitle) modalTitle.textContent = title;
+  if (modalDetail) modalDetail.textContent = detail;
+  if (modalDesc) modalDesc.innerHTML = desc.replaceAll('
 ', '<br>');
 
-  const modalArt = document.querySelector('#modalArt');
   if (modalArt) {
     if (image) {
       modalArt.style.background = 'center / cover no-repeat url(' + image + ')';
@@ -111,23 +121,19 @@ function openModal(index) {
   }
 }
 
-// 4. 이벤트 위임(Event Delegation)으로 카드 어디를 눌러도 100% 모달 띄우기
 document.addEventListener('click', (e) => {
-  // 닫기 버튼 클릭
   if (e.target.closest('#closeDetail')) {
     const detailModal = document.querySelector('#detailModal');
     if (detailModal) detailModal.close();
     return;
   }
 
-  // 모달 바깥 배경 클릭
   const detailModal = document.querySelector('#detailModal');
   if (detailModal && e.target === detailModal) {
     detailModal.close();
     return;
   }
 
-  // 프로젝트 카드 클릭
   const projectCard = e.target.closest('.project');
   if (projectCard) {
     const allProjects = Array.from(document.querySelectorAll('.project'));
