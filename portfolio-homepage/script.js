@@ -51,7 +51,7 @@ function applyContent(content) {
     mail.href = 'mailto:' + content.email;
     mail.innerHTML = content.email + ' <span>&nearr;</span>';
   }
-  if (content.heroSize) document.documentElement.style.setProperty('--hero-size', content.heroSize + 'px');
+  if (content.heroSize) document.documentElement.style.setProperty('--hero-size', content.heroSize + 'px'); const h1 = document.querySelector('#heroTitle'); if (h1) h1.style.fontSize = content.heroSize + 'px'; const h2 = document.querySelector('#aboutTitle'); if (h2) h2.style.fontSize = content.aboutSize + 'px';
   if (content.aboutSize) document.documentElement.style.setProperty('--about-size', content.aboutSize + 'px');
   if (content.heroBg) document.documentElement.style.setProperty('--hero-bg', content.heroBg);
   if (content.contactBg) document.documentElement.style.setProperty('--contact-bg', content.contactBg);
