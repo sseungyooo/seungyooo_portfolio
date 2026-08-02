@@ -18,3 +18,10 @@
 .modal-body h2 { font-size: clamp(24px, 3.5vw, 36px); letter-spacing: -0.05em; margin: 12px 0 0; line-height: 1.1; color: var(--ink); }
 .modal-divider { border: 0; height: 1px; background: var(--line); margin: 24px 0; }
 .modal-description { font-size: 15px; line-height: 1.75; color: var(--ink); margin: 0; white-space: pre-wrap; }
+
+
+/* Ensure 100% Clickable Project Cards */
+.project, .project * { cursor: pointer !important; }
+.project { user-select: none; transition: transform 0.25s ease, filter 0.25s ease; position: relative; z-index: 1; }
+.project:hover { transform: translateY(-8px); }
+.project:active { transform: translateY(-2px) scale(0.99); }

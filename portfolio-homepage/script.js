@@ -33,18 +33,26 @@ const defaults = {
 
 let currentContent = { ...defaults };
 
+// 1. 초기 기본 콘텐츠 적용
 applyContent(defaults);
 
-const { data, error } = await supabase.from('site_content').select('content').eq('id', 'main').maybeSingle();
-if (!error && data?.content) {
-  currentContent = { ...defaults, ...data.content };
-  applyContent(currentContent);
+// 2. Supabase에서 최신 데이터 불러와서 적용
+try {
+  const { data, error } = await supabase.from('site_content').select('content').eq('id', 'main').maybeSingle();
+  if (!error && data?.content) {
+    currentContent = { ...defaults, ...data.content };
+    applyContent(currentContent);
+  }
+} catch (err) {
+  console.log('Supabase fetch error:', err);
 }
 
 function applyContent(content) {
   [['heroTitle','heroTitle'],['heroIntro','heroIntro'],['aboutTitle','aboutTitle'],['aboutText','aboutText']].forEach(([key,id]) => {
-    if (content[key]) document.querySelector('#' + id).innerHTML = content[key].replaceAll('
+    if (content[key] && document.querySelector('#' + id)) {
+      document.querySelector('#' + id).innerHTML = content[key].replaceAll('
 ','<br>');
+    }
   });
   const mail = document.querySelector('#contactEmail');
   if (mail) {
@@ -69,36 +77,63 @@ function applyContent(content) {
   }
 }
 
-const detailModal = document.querySelector('#detailModal');
-const closeDetail = document.querySelector('#closeDetail');
+// 3. 모달 팝업 열기 함수
+function openModal(index) {
+  const detailModal = document.querySelector('#detailModal');
+  if (!detailModal) return;
 
-if (detailModal && closeDetail) {
-  closeDetail.addEventListener('click', () => detailModal.close());
-  detailModal.addEventListener('click', (e) => {
-    if (e.target === detailModal) detailModal.close();
-  });
+  const title = currentContent['projectTitle' + index] || '프로젝트';
+  const detail = currentContent['projectDetail' + index] || '';
+  const desc = currentContent['projectDesc' + index] || '상세 설명이 준비되어 있습니다.';
+  const image = currentContent['projectImage' + index];
 
-  document.querySelectorAll('.project').forEach((article, index) => {
-    article.addEventListener('click', () => {
-      const title = currentContent['projectTitle' + index] || '프로젝트';
-      const detail = currentContent['projectDetail' + index] || '';
-      const desc = currentContent['projectDesc' + index] || '상세 설명이 준비되어 있습니다.';
-      const image = currentContent['projectImage' + index];
-
-      document.querySelector('#modalTitle').textContent = title;
-      document.querySelector('#modalDetail').textContent = detail;
-      document.querySelector('#modalDesc').innerHTML = desc.replaceAll('
+  document.querySelector('#modalTitle').textContent = title;
+  document.querySelector('#modalDetail').textContent = detail;
+  document.querySelector('#modalDesc').innerHTML = desc.replaceAll('
 ', '<br>');
 
-      const modalArt = document.querySelector('#modalArt');
-      if (image) {
-        modalArt.style.background = 'center / cover no-repeat url(' + image + ')';
-      } else {
-        const bgColors = ['#ccb9f8', '#fd7e58', '#172426'];
-        modalArt.style.background = bgColors[index % 3];
-      }
+  const modalArt = document.querySelector('#modalArt');
+  if (modalArt) {
+    if (image) {
+      modalArt.style.background = 'center / cover no-repeat url(' + image + ')';
+      modalArt.style.height = '300px';
+    } else {
+      const bgColors = ['#ccb9f8', '#fd7e58', '#172426'];
+      modalArt.style.background = bgColors[index % 3];
+      modalArt.style.height = '200px';
+    }
+  }
 
-      detailModal.showModal();
-    });
-  });
+  if (typeof detailModal.showModal === 'function') {
+    detailModal.showModal();
+  } else {
+    detailModal.setAttribute('open', 'true');
+  }
 }
+
+// 4. 이벤트 위임(Event Delegation)으로 카드 어디를 눌러도 100% 모달 띄우기
+document.addEventListener('click', (e) => {
+  // 닫기 버튼 클릭
+  if (e.target.closest('#closeDetail')) {
+    const detailModal = document.querySelector('#detailModal');
+    if (detailModal) detailModal.close();
+    return;
+  }
+
+  // 모달 바깥 배경 클릭
+  const detailModal = document.querySelector('#detailModal');
+  if (detailModal && e.target === detailModal) {
+    detailModal.close();
+    return;
+  }
+
+  // 프로젝트 카드 클릭
+  const projectCard = e.target.closest('.project');
+  if (projectCard) {
+    const allProjects = Array.from(document.querySelectorAll('.project'));
+    const index = allProjects.indexOf(projectCard);
+    if (index !== -1) {
+      openModal(index);
+    }
+  }
+});
