@@ -27,4 +27,5 @@
 .project:hover { transform: translateY(-8px); }
 .project:active { transform: translateY(-2px) scale(0.99); }
 
-.hero h1{line-hei
+.hero h1 { line-height: 1.5 !important; }
+.about h2 { line-height: 1.5 !important; }
