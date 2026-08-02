@@ -29,3 +29,11 @@
 
 .hero h1 { line-height: 1.5 !important; }
 .about h2 { line-height: 1.5 !important; }
+
+/* Selected work: compact six-card gallery */
+.section-head{align-items:center}
+.work-more{font:12px 'DM Mono',monospace;color:var(--ink);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:3px;transition:opacity .2s}
+.work-more:hover{opacity:.55}.work-more span{font-size:18px;line-height:0;vertical-align:-1px}
+.work-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:54px 1.2vw}.project:nth-child(3){grid-column:auto}.project-large .project-art,.project-art{aspect-ratio:1/1;padding:14px}.project-art span{position:relative;z-index:1}.project-meta{padding-top:12px}.project-meta h2{font-size:14px}.project-meta p{font-size:9px}.project:hover{transform:translateY(-5px)}
+@media(max-width:850px){.work-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 2vw}}
+@media(max-width:540px){.section-head{margin-bottom:28px}.work-grid{grid-template-columns:1fr;gap:30px}.project:nth-child(3){margin-left:0}.work-more{font-size:11px}}
