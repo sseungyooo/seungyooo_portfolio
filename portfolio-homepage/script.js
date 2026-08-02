@@ -19,6 +19,12 @@ const defaults = {
   projectDetail1: 'Art direction · 2025',
   projectTitle2: 'Objects in form',
   projectDetail2: 'Digital experience · 2024',
+  projectTitle3: 'Visual system',
+  projectDetail3: 'Brand experience · 2024',
+  projectTitle4: 'Archive edition',
+  projectDetail4: 'Editorial design · 2024',
+  projectTitle5: 'New object',
+  projectDetail5: 'Digital product · 2024',
   projectDesc0: '웰니스 브랜드를 위한 통합 브랜드 아이덴티티 디렉션입니다.',
   projectDesc1: '패션 및 라이프스타일 에디토리얼을 위한 아트 디렉션 프로젝트입니다.',
   projectDesc2: '사물의 형태와 질감을 디지털 공간에서 탐구하는 인터랙티브 웹 경험 프로젝트입니다.'
@@ -56,24 +62,20 @@ function applyContent(content) {
   if (content.heroBg) document.documentElement.style.setProperty('--hero-bg', content.heroBg);
   if (content.contactBg) document.documentElement.style.setProperty('--contact-bg', content.contactBg);
 
-  for (let i = 0; i < 3; i++) {
-    const art = document.querySelector('#projectArt' + i);
-    const titleEl = document.querySelector('#projectTitle' + i);
-    const detailEl = document.querySelector('#projectDetail' + i);
-    if (titleEl && content['projectTitle' + i]) titleEl.textContent = content['projectTitle' + i];
-    if (detailEl && content['projectDetail' + i]) detailEl.textContent = content['projectDetail' + i];
+  renderProjects(content);
+}
 
-    if (art) {
-      if (content['projectImage' + i]) {
-        art.style.background = 'center / cover no-repeat url(' + content['projectImage' + i] + ')';
-        art.querySelectorAll('.shape, span').forEach(node => node.style.display = 'none');
-      } else {
-        const bgColors = ['#ccb9f8', '#fd7e58', '#172426'];
-        art.style.background = bgColors[i % 3];
-        art.querySelectorAll('.shape, span').forEach(node => node.style.display = '');
-      }
-    }
-  }
+function renderProjects(content) {
+  const grid = document.querySelector('#workGrid');
+  if (!grid) return;
+  const colors = ['#ccb9f8', '#fd7e58', '#172426', '#c9e7d4', '#f6dfc5', '#b7c5ff'];
+  grid.innerHTML = Array.from({ length: 6 }, (_, i) => {
+    const image = content['projectImage' + i];
+    const title = content['projectTitle' + i] || `Project ${String(i + 1).padStart(2, '0')}`;
+    const detail = content['projectDetail' + i] || '';
+    const artStyle = image ? `style="background:center / cover no-repeat url('${image}')"` : `style="background:${colors[i]}"`;
+    return `<article class="project" data-project-index="${i}"><div class="project-art" ${artStyle}><span>${String(i + 1).padStart(2, '0')}</span></div><div class="project-meta"><h2>${title}</h2><p>${detail}</p></div></article>`;
+  }).join('');
 }
 
 function initScript() {
