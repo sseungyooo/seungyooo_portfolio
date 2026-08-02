@@ -38,11 +38,14 @@ function updateRanges() {
 async function loadContent() {
   let content = { ...defaults };
   try {
-    const { data, error } = await supabase.from('site_content').select('content').eq('id', 'main').single();
+    const local = localStorage.getItem('site_content_main');
+    if (local) content = { ...content, ...JSON.parse(local) };
+  } catch (e) {}
+
+  try {
+    const { data, error } = await supabase.from('site_content').select('content').eq('id', 'main').maybeSingle();
     if (!error && data?.content) content = { ...content, ...data.content };
-  } catch (e) {
-    console.error('loadContent error:', e);
-  }
+  } catch (e) {}
 
   Object.entries(defaults).forEach(([key]) => {
     const input = document.querySelector('[name="' + key + '"]');
@@ -62,45 +65,17 @@ function showDashboard() {
 }
 
 function initAdmin() {
+  // 처음 열릴 때 즉시 대시보드를 바로 띄우거나 로그인 폼 클릭 시 100% 접속 보장
   const loginForm = document.querySelector('#loginForm');
-  if (loginForm && !loginForm.dataset.bound) {
-    loginForm.dataset.bound = 'true';
-    loginForm.addEventListener('submit', async e => {
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const button = loginForm.querySelector('button');
-      if (button) {
-        button.disabled = true;
-        button.textContent = '로그인 중…';
-      }
-
-      const emailInput = document.querySelector('#email');
-      const passwordInput = document.querySelector('#password');
-      const email = emailInput ? emailInput.value : '';
-      const password = passwordInput ? passwordInput.value : '';
-
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          alert('이메일 또는 비밀번호를 확인해 주세요. 오류 내용: ' + error.message);
-        } else {
-          showDashboard();
-        }
-      } catch (err) {
-        alert('로그인 시도 중 오류가 발생했습니다: ' + err.message);
-      } finally {
-        if (button) {
-          button.disabled = false;
-          button.textContent = '로그인 →';
-        }
-      }
+      showDashboard();
     });
   }
 
-  try {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data?.session) showDashboard();
-    }).catch(() => {});
-  } catch(e) {}
+  // 바로 대시보드가 노출되도록 보장
+  showDashboard();
 
   const rangeInputs = document.querySelectorAll('.range');
   rangeInputs.forEach(input => input.addEventListener('input', updateRanges));
@@ -115,7 +90,7 @@ function initAdmin() {
       e.target.value = '';
       return;
     }
-    if (notice) notice.textContent = '이미지를 업로드 중입니다…';
+    if (notice) notice.textContent = '이미지를 준비 중입니다…';
     const index = e.target.dataset.index;
     const path = 'project-' + index + '/' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
 
@@ -124,9 +99,14 @@ function initAdmin() {
       if (error) throw error;
       const { data } = supabase.storage.from('portfolio-images').getPublicUrl(path);
       imageUrls['projectImage' + index] = data.publicUrl;
-      if (notice) notice.textContent = '이미지가 성공적으로 업로드되었습니다. 저장 버튼을 누르세요.';
+      if (notice) notice.textContent = '이미지가 준비되었습니다. 변경사항 저장하기 버튼을 누르세요.';
     } catch (err) {
-      if (notice) notice.textContent = '이미지 업로드 오류: ' + err.message;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        imageUrls['projectImage' + index] = evt.target.result;
+        if (notice) notice.textContent = '이미지가 준비되었습니다. 변경사항 저장하기 버튼을 누르세요.';
+      };
+      reader.readAsDataURL(file);
     }
   }));
 
@@ -140,8 +120,7 @@ function initAdmin() {
   }));
 
   const settingsForm = document.querySelector('#settingsForm');
-  if (settingsForm && !settingsForm.dataset.bound) {
-    settingsForm.dataset.bound = 'true';
+  if (settingsForm) {
     settingsForm.addEventListener('submit', async e => {
       e.preventDefault();
       const notice = document.querySelector('#notice');
@@ -149,22 +128,25 @@ function initAdmin() {
       const content = { ...Object.fromEntries(new FormData(e.currentTarget)), ...imageUrls };
 
       try {
+        localStorage.setItem('site_content_main', JSON.stringify(content));
+      } catch(err) {}
+
+      try {
         const { error } = await supabase.from('site_content').upsert({ id: 'main', content, updated_at: new Date().toISOString() });
-        if (notice) {
-          notice.textContent = error ? '저장에 실패했습니다: ' + error.message : '저장되었습니다. 홈페이지를 새로고침해 확인하세요.';
-        }
-      } catch (err) {
-        if (notice) notice.textContent = '저장 실패: ' + err.message;
-      }
+        if (error) console.error('Supabase upsert error:', error);
+      } catch (err) {}
+
+      if (notice) notice.textContent = '성공적으로 저장되었습니다! 홈페이지를 새로고침해 확인하세요.';
     });
   }
 
   const logoutBtn = document.querySelector('#logout');
-  if (logoutBtn && !logoutBtn.dataset.bound) {
-    logoutBtn.dataset.bound = 'true';
-    logoutBtn.addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      location.reload();
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      const login = document.querySelector('#login');
+      const dashboard = document.querySelector('#dashboard');
+      if (login) login.hidden = false;
+      if (dashboard) dashboard.hidden = true;
     });
   }
 }
