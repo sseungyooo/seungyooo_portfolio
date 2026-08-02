@@ -81,8 +81,7 @@ function initAdmin() {
       try {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
-          alert('이메일 또는 비밀번호를 확인해 주세요.
-오류 내용: ' + error.message);
+          alert('이메일 또는 비밀번호를 확인해 주세요. 오류 내용: ' + error.message);
         } else {
           showDashboard();
         }
