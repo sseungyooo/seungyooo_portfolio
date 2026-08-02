@@ -32,3 +32,10 @@ function render(content) {
 render(defaults);
 const { data } = await supabase.from('site_content').select('content').eq('id', 'main').maybeSingle();
 if (data?.content) render({ ...defaults, ...data.content });
+
+const homeGrid = document.querySelector('#workGrid');
+homeGrid.addEventListener('wheel', event => {
+  if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+  event.preventDefault();
+  homeGrid.scrollBy({ left: event.deltaY * 0.65, behavior: 'smooth' });
+}, { passive: false });
