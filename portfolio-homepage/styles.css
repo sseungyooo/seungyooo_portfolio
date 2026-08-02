@@ -27,8 +27,8 @@
 .project:hover { transform: translateY(-8px); }
 .project:active { transform: translateY(-2px) scale(0.99); }
 
-.hero h1 { line-height: 1.5 !important; }
-.about h2 { line-height: 1.5 !important; }
+.hero h1 { line-height: 1.12 !important; }
+.about h2 { line-height: 1.12 !important; }
 
 /* Selected work: compact six-card gallery */
 .section-head{align-items:center}
