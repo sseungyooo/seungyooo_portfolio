@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEUNG — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <style>.admin-link{font:11px 'DM Mono',monospace;border:1px solid #171714;padding:7px 10px;border-radius:20px}@media(max-width:680px){.admin-link{display:none}}.hero h1{font-size:var(--hero-size,clamp(50px,8.3vw,130px))}.about h2{font-size:var(--about-size,clamp(38px,5vw,72px))}.hero{background:var(--hero-bg,transparent)}.contact{background:var(--contact-bg,#171714)}</style>
+</head>
+<body>
+  <header class="nav"><a class="brand" href="#top">SEUNG<span>·</span></a><nav><a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a></nav><a class="admin-link" href="admin.html">Login ↗</a><button class="menu" aria-label="메뉴">☰</button></header>
+  <main id="top">
+    <section class="hero">
+      <p class="eyebrow">INDEPENDENT CREATIVE / 2026</p>
+      <h1 id="heroTitle">관찰하고,<br><em>더 나은 경험을</em><br>만듭니다.</h1>
+      <div class="hero-bottom"><p id="heroIntro">디지털 제품과 브랜드에<br>명료한 방향을 더하는 디자이너입니다.</p><a class="round-link" href="#work">작업 보기 <span>↓</span></a></div>
+      <div class="orb orb-one"></div><div class="orb orb-two"></div>
+    </section>
+
+    <section id="work" class="work section">
+      <div class="section-head"><p class="eyebrow">SELECTED WORK <span>(03)</span></p><button id="openUpload" class="text-button">+ 작업 추가</button></div>
+      <div id="workGrid" class="work-grid">
+        <article class="project project-large"><div id="projectArt0" class="project-art art-a"><span>01</span><div class="shape a-shape"></div></div><div class="project-meta"><h2 id="projectTitle0">Ovoid / Wellness</h2><p id="projectDetail0">Brand identity · 2025</p></div></article>
+        <article class="project"><div id="projectArt1" class="project-art art-b"><span>02</span><div class="shape b-shape"></div></div><div class="project-meta"><h2 id="projectTitle1">Juun / Editorial</h2><p id="projectDetail1">Art direction · 2025</p></div></article>
+        <article class="project"><div id="projectArt2" class="project-art art-c"><span>03</span><div class="shape c-shape">OBJECT<br>STUDY</div></div><div class="project-meta"><h2 id="projectTitle2">Objects in form</h2><p id="projectDetail2">Digital experience · 2024</p></div></article>
+      </div>
+    </section>
+
+    <section id="about" class="about section"><p class="eyebrow">ABOUT ME</p><div><h2 id="aboutTitle">생각의 빈틈을<br>형태로 채웁니다.</h2><p id="aboutText" class="body-copy">서울을 기반으로 활동하며, 브랜드의 본질을 발견하고 사람들이 자연스럽게 머무는 경험을 설계합니다. 전략부터 최종 디테일까지 함께합니다.</p><div class="skills"><span>BRAND DESIGN</span><span>DIGITAL PRODUCT</span><span>ART DIRECTION</span></div></div></section>
+
+    <section id="contact" class="contact"><p class="eyebrow">LET'S WORK TOGETHER</p><a id="contactEmail" href="mailto:hello@example.com">hello@example.com <span>↗</span></a><p class="footer-note">© 2026 SEUNG. ALL RIGHTS RESERVED.</p></section>
+  </main>
+
+  <dialog id="uploadDialog"><form id="projectForm" method="dialog"><button class="close" type="button" id="closeUpload" aria-label="닫기">×</button><p class="eyebrow">NEW PROJECT</p><h2>작업을 추가하세요.</h2><label>프로젝트 이름<input required name="title" placeholder="예: 새로운 브랜딩"></label><label>분야 · 연도<input required name="detail" placeholder="예: Brand identity · 2026"></label><label class="file-label">대표 이미지 선택<input id="imageInput" name="image" type="file" accept="image/*"><small>선택하지 않으면 색상 카드로 표시됩니다.</small></label><button class="submit" type="submit">포트폴리오에 추가 →</button></form></dialog>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
