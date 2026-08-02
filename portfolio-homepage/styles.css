@@ -27,8 +27,8 @@
 .project:hover { transform: translateY(-8px); }
 .project:active { transform: translateY(-2px) scale(0.99); }
 
-.hero h1 { line-height: 1.12 !important; }
-.about h2 { line-height: 1.12 !important; }
+.hero h1 { line-height: 1.5 !important; }
+.about h2 { line-height: 1.5 !important; }
 
 /* Selected work: compact six-card gallery */
 .section-head{align-items:center}
@@ -37,3 +37,6 @@
 .work-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:54px 1.2vw}.project:nth-child(3){grid-column:auto}.project-large .project-art,.project-art{aspect-ratio:1/1;padding:14px}.project-art span{position:relative;z-index:1}.project-meta{padding-top:12px}.project-meta h2{font-size:14px}.project-meta p{font-size:9px}.project:hover{transform:translateY(-5px)}
 @media(max-width:850px){.work-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 2vw}}
 @media(max-width:540px){.section-head{margin-bottom:28px}.work-grid{grid-template-columns:1fr;gap:30px}.project:nth-child(3){margin-left:0}.work-more{font-size:11px}}
+
+/* All work: horizontal wheel-driven gallery */
+.project{color:inherit;text-decoration:none}.all-work{padding-right:0}.scroll-guide{font:10px 'DM Mono',monospace;margin:0;color:#73716b}.all-work-grid{display:flex;gap:22px;overflow-x:auto;padding:28px 4.4vw 56px 0;scroll-snap-type:x proximity;overscroll-behavior-x:contain;scrollbar-width:thin}.all-work-grid::-webkit-scrollbar{height:6px}.all-work-grid::-webkit-scrollbar-thumb{background:#b8b6ae;border-radius:99px}.all-work-card{flex:0 0 clamp(270px,29vw,460px);scroll-snap-align:start;cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1),filter .35s;transform-origin:center bottom}.all-work-card .project-art{aspect-ratio:4/5}.all-work-card:hover{transform:translateY(-34px);filter:drop-shadow(0 25px 16px rgba(23,23,20,.16));position:relative;z-index:2}.all-work-card .project-meta{padding-top:14px}@media(max-width:680px){.scroll-guide{display:none}.all-work-grid{gap:14px;padding-bottom:38px}.all-work-card{flex-basis:76vw}.all-work-card:hover{transform:translateY(-18px)}}
