@@ -26,27 +26,16 @@ const defaults = {
 
 let currentContent = { ...defaults };
 
-// 1. 초기 렌더링
-applyContent(defaults);
-
-// 2. LocalStorage 최신 데이터 동기화
-try {
-  const local = localStorage.getItem('site_content_main');
-  if (local) {
-    currentContent = { ...defaults, ...JSON.parse(local) };
-    applyContent(currentContent);
+async function fetchAndApplySupabaseData() {
+  try {
+    const { data, error } = await supabase.from('site_content').select('content').eq('id', 'main').maybeSingle();
+    if (!error && data?.content) {
+      currentContent = { ...defaults, ...data.content };
+      applyContent(currentContent);
+    }
+  } catch (err) {
+    console.log('Supabase fetch notice:', err);
   }
-} catch (e) {}
-
-// 3. Supabase 서버 최신 데이터 실시간 불러오기
-try {
-  const { data, error } = await supabase.from('site_content').select('content').eq('id', 'main').maybeSingle();
-  if (!error && data?.content) {
-    currentContent = { ...defaults, ...data.content };
-    applyContent(currentContent);
-  }
-} catch (err) {
-  console.log('Supabase fetch notice:', err);
 }
 
 function applyContent(content) {
@@ -74,11 +63,28 @@ function applyContent(content) {
     if (titleEl && content['projectTitle' + i]) titleEl.textContent = content['projectTitle' + i];
     if (detailEl && content['projectDetail' + i]) detailEl.textContent = content['projectDetail' + i];
 
-    if (art && content['projectImage' + i]) {
-      art.style.background = 'center / cover no-repeat url(' + content['projectImage' + i] + ')';
-      art.querySelectorAll('.shape, span').forEach(node => node.style.display = 'none');
+    if (art) {
+      if (content['projectImage' + i]) {
+        art.style.background = 'center / cover no-repeat url(' + content['projectImage' + i] + ')';
+        art.querySelectorAll('.shape, span').forEach(node => node.style.display = 'none');
+      } else {
+        const bgColors = ['#ccb9f8', '#fd7e58', '#172426'];
+        art.style.background = bgColors[i % 3];
+        art.querySelectorAll('.shape, span').forEach(node => node.style.display = '');
+      }
     }
   }
+}
+
+function initScript() {
+  applyContent(defaults);
+  fetchAndApplySupabaseData();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initScript);
+} else {
+  initScript();
 }
 
 function openModal(index) {
