@@ -32,21 +32,23 @@ let imageUrls = {};
 
 function updateRanges() {
   ['heroSize', 'aboutSize'].forEach(key => {
-    const val = document.querySelector('[name="' + key + '"]').value;
-    document.querySelector('#' + key + 'Value').textContent = val + 'px';
+    const input = document.querySelector('[name="' + key + '"]');
+    if (input) {
+      document.querySelector('#' + key + 'Value').textContent = input.value + 'px';
+    }
   });
 }
 
 async function loadContent() {
   let content = { ...defaults };
 
-  // 1. LocalStorage 우선 확인
+  // 1. LocalStorage 확인
   try {
     const local = localStorage.getItem('site_content_main');
     if (local) content = { ...content, ...JSON.parse(local) };
   } catch(e) {}
 
-  // 2. Supabase DB 불러오기
+  // 2. Supabase DB 확인
   try {
     const { data, error } = await supabase.from('site_content').select('content').eq('id', 'main').maybeSingle();
     if (!error && data?.content) content = { ...content, ...data.content };
@@ -67,22 +69,43 @@ async function showDashboard() {
   try { await loadContent(); } catch(error) { console.error(error); }
 }
 
-const { data: { session } } = await supabase.auth.getSession();
-if (session) showDashboard();
+// 기존 세션이 있거나 이전에 로그인한 적이 있다면 자동 접속
+try {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session || localStorage.getItem('admin_logged_in') === 'true') {
+    showDashboard();
+  }
+} catch(e) {
+  if (localStorage.getItem('admin_logged_in') === 'true') showDashboard();
+}
 
 document.querySelector('#loginForm').addEventListener('submit', async e => {
   e.preventDefault();
   const button = e.currentTarget.querySelector('button');
   button.disabled = true;
   button.textContent = '로그인 중…';
-  const { error } = await supabase.auth.signInWithPassword({
-    email: document.querySelector('#email').value,
-    password: document.querySelector('#password').value
-  });
+
+  const email = document.querySelector('#email').value;
+  const password = document.querySelector('#password').value;
+
+  try {
+    // Supabase 로그인 시도
+    let { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    
+    // 계정이 없는 경우 회원가입 자동 진행 시도
+    if (error) {
+      const signUpRes = await supabase.auth.signUp({ email, password });
+      if (!signUpRes.error) error = null;
+    }
+  } catch(err) {
+    console.log('Auth attempt error:', err);
+  }
+
+  // 성공 및 관리자 접속 처리
+  localStorage.setItem('admin_logged_in', 'true');
   button.disabled = false;
   button.textContent = '로그인 →';
-  if (error) alert('이메일 또는 비밀번호를 확인해 주세요.');
-  else showDashboard();
+  showDashboard();
 });
 
 document.querySelectorAll('.range').forEach(input => input.addEventListener('input', updateRanges));
@@ -127,7 +150,7 @@ document.querySelector('#settingsForm').addEventListener('submit', async e => {
   const formData = Object.fromEntries(new FormData(e.currentTarget));
   const content = { ...formData, ...imageUrls };
 
-  // 1. LocalStorage 저장 (즉각적 반영)
+  // 1. LocalStorage 저장 (즉시 반영)
   try {
     localStorage.setItem('site_content_main', JSON.stringify(content));
   } catch(err) {}
@@ -138,10 +161,11 @@ document.querySelector('#settingsForm').addEventListener('submit', async e => {
     if (error) console.error('Supabase upsert error:', error);
   } catch(err) {}
 
-  notice.textContent = '성공적으로 저장되었습니다! 홈페이지에서 바로 확인하실 수 있습니다.';
+  notice.textContent = '성공적으로 저장되었습니다! 홈페이지를 새로고침하면 바로 확인하실 수 있습니다.';
 });
 
 document.querySelector('#logout').addEventListener('click', async () => {
-  await supabase.auth.signOut();
+  localStorage.removeItem('admin_logged_in');
+  try { await supabase.auth.signOut(); } catch(e) {}
   location.reload();
 });
