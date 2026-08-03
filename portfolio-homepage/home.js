@@ -19,11 +19,10 @@ function render(content) {
   document.documentElement.style.setProperty('--about-size', `${content.aboutSize || 48}px`);
   document.documentElement.style.setProperty('--hero-bg', content.heroBg || '#fefefe');
   document.documentElement.style.setProperty('--contact-bg', content.contactBg || '#171714');
-  const heroImage = document.querySelector('#heroImage');
-  const heroImageBox = document.querySelector('#heroImageBox');
-  if (heroImage && heroImageBox) {
-    if (content.heroImage) { heroImage.src = content.heroImage; heroImage.hidden = false; heroImageBox.classList.add('has-image'); }
-    else { heroImage.removeAttribute('src'); heroImage.hidden = true; heroImageBox.classList.remove('has-image'); }
+  const hero = document.querySelector('.hero');
+  if (hero) {
+    if (content.heroImage) { hero.style.setProperty('--hero-image', `url("${content.heroImage}")`); hero.classList.add('has-hero-image'); }
+    else { hero.style.removeProperty('--hero-image'); hero.classList.remove('has-hero-image'); }
   }
   const email = document.querySelector('#contactEmail');
   if (email && content.email) { email.href = `mailto:${content.email}`; email.innerHTML = `${content.email} <span>↗</span>`; }
