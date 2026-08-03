@@ -17,7 +17,7 @@ function render(content) {
   });
   document.documentElement.style.setProperty('--hero-size', `${content.heroSize || 66}px`);
   document.documentElement.style.setProperty('--about-size', `${content.aboutSize || 48}px`);
-  document.documentElement.style.setProperty('--hero-bg', content.heroBg || '#f2f0ea');
+  document.documentElement.style.setProperty('--hero-bg', content.heroBg || '#fefefe');
   document.documentElement.style.setProperty('--contact-bg', content.contactBg || '#171714');
   const email = document.querySelector('#contactEmail');
   if (email && content.email) { email.href = `mailto:${content.email}`; email.innerHTML = `${content.email} <span>↗</span>`; }
