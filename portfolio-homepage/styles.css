@@ -87,3 +87,9 @@
 
 /* Full hero background image */
 .hero{grid-template-columns:1fr;background-color:var(--hero-bg,transparent);background-image:var(--hero-image,none);background-size:cover;background-position:center;isolation:isolate}.hero-copy{max-width:min(760px,56vw)}.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.84) 0%,rgba(255,255,255,.56) 47%,rgba(255,255,255,.1) 100%);z-index:0;pointer-events:none}.hero:not(.has-hero-image)::before{display:none}.hero-image{display:none}.hero .hero-bottom{left:auto;right:4.4vw;bottom:5vh;z-index:3}@media(max-width:760px){.hero-copy{max-width:none}.hero .hero-bottom{left:auto;right:4.4vw;bottom:28px}.hero::before{background:rgba(255,255,255,.45)}}
+
+/* Hero 메인 텍스트 크기 */
+
+.hero h1{font-size:clamp(44px, 4vw, 64px) !important;
+ line-height:1.45 !important;
+ max-width:780px;}
