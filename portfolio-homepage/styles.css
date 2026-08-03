@@ -52,4 +52,15 @@
 .project-page-detail{margin-bottom:clamp(52px,9vh,120px)}
 .project-page-image{width:100%;aspect-ratio:16/8.5;margin:0 0 clamp(70px,11vh,150px)}
 .project-page-copy{max-width:640px;margin-right:clamp(0px,7vw,110px)}
+.project-page-detail + .project-page-copy{margin-top:clamp(46px,7vh,92px);margin-bottom:clamp(58px,9vh,120px)}
 @media(max-width:680px){.project-page{padding:48px 24px 96px}.back-project{margin-bottom:42px}.project-page>h1{margin-top:32px}.project-page-image{aspect-ratio:1/1}.project-page-copy{margin-right:0}}
+
+/* Editorial project layout */
+.project-page{max-width:760px;margin:0 auto;padding:clamp(40px,5vw,70px) 28px 110px}
+.project-page .back-project,.project-page #projectIndex{display:none}
+.project-page>h1{font-size:clamp(50px,5.6vw,82px);line-height:.98;letter-spacing:-.08em;margin:0 0 20px;max-width:none}
+.project-page-detail{font-size:10px;margin:0 0 clamp(52px,7vw,88px)}
+.project-page-copy{max-width:none;margin:0 0 28px}
+.project-page-copy>p:last-child{font-size:14px;line-height:1.7;margin:12px 0 0}
+.project-page-image{aspect-ratio:16/9;margin:0;width:100%}
+@media(max-width:680px){.project-page{padding:42px 22px 72px}.project-page>h1{font-size:48px}.project-page-detail{margin-bottom:46px}.project-page-image{aspect-ratio:1/1}}
