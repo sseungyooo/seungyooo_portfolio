@@ -32,6 +32,19 @@ function render(content) {
     if (content.aboutImage) { aboutImage.src = content.aboutImage; aboutImage.hidden = false; aboutImageBox.classList.add('has-image'); }
     else { aboutImage.removeAttribute('src'); aboutImage.hidden = true; aboutImageBox.classList.remove('has-image'); }
   }
+  const galleryTrack = document.querySelector('#aboutGalleryTrack');
+  if (galleryTrack) {
+    const galleryImages = Array.from({ length: 9 }, (_, index) => content['aboutGalleryImage' + index]).filter(Boolean);
+    galleryTrack.innerHTML = galleryImages.map((src, index) => '<div class="about-gallery-item"><img src="' + src + '" alt="소개 이미지 ' + (index + 1) + '"></div>').join('');
+    galleryTrack.parentElement.classList.toggle('has-images', galleryImages.length > 0);
+    if (galleryImages.length > 3 && !galleryTrack.dataset.started) {
+      galleryTrack.dataset.started = 'true';
+      window.setInterval(() => {
+        galleryTrack.classList.add('is-shifting');
+        window.setTimeout(() => { galleryTrack.append(galleryTrack.firstElementChild); galleryTrack.classList.remove('is-shifting'); }, 650);
+      }, 3000);
+    }
+  }
   const email = document.querySelector('#contactEmail');
   if (email && content.email) { email.href = `mailto:${content.email}`; email.innerHTML = `${content.email} <span>↗</span>`; }
   const grid = document.querySelector('#workGrid');
