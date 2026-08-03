@@ -34,9 +34,9 @@
   font-size:24px;
   font-weight:500;
   line-height:1.6;
-  letter-spacing:-0.02em;
-  color:#555555;
-  max-width:640px;
+  letter-spacing:-0.1em;
+  color:#6E6E6E;
+  max-width:1000px;
 }
 
 .hero-bottom{
