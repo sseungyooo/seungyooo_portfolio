@@ -57,7 +57,8 @@
 
 /* Editorial project layout */
 .project-page{max-width:760px;margin:0 auto;padding:clamp(40px,5vw,70px) 28px 110px}
-.project-page .back-project,.project-page #projectIndex{display:none}
+.project-page #projectIndex{display:none}
+.project-page .back-project{display:inline-block}
 .project-page>h1{font-size:clamp(50px,5.6vw,82px);line-height:.98;letter-spacing:-.08em;margin:0 0 20px;max-width:none}
 .project-page-detail{font-size:10px;margin:0 0 clamp(52px,7vw,88px)}
 .project-page-copy{max-width:none;margin:0 0 28px}
