@@ -33,16 +33,46 @@ function render(content) {
     else { aboutImage.removeAttribute('src'); aboutImage.hidden = true; aboutImageBox.classList.remove('has-image'); }
   }
   const galleryTrack = document.querySelector('#aboutGalleryTrack');
+  const galleryPrev = document.querySelector('#aboutGalleryPrev');
+  const galleryNext = document.querySelector('#aboutGalleryNext');
   if (galleryTrack) {
     const galleryImages = Array.from({ length: 9 }, (_, index) => content['aboutGalleryImage' + index]).filter(Boolean);
     galleryTrack.innerHTML = galleryImages.map((src, index) => '<div class="about-gallery-item"><img src="' + src + '" alt="소개 이미지 ' + (index + 1) + '"></div>').join('');
     galleryTrack.parentElement.classList.toggle('has-images', galleryImages.length > 0);
-    if (galleryImages.length > 3 && !galleryTrack.dataset.started) {
-      galleryTrack.dataset.started = 'true';
-      window.setInterval(() => {
+    const canMove = galleryImages.length > 3;
+    if (galleryPrev) galleryPrev.disabled = !canMove;
+    if (galleryNext) galleryNext.disabled = !canMove;
+    const moveGallery = direction => {
+      if (!canMove || galleryTrack.dataset.moving === 'true') return;
+      galleryTrack.dataset.moving = 'true';
+      const finish = () => {
+        galleryTrack.style.transition = 'none';
+        if (direction > 0) galleryTrack.append(galleryTrack.firstElementChild);
+        galleryTrack.classList.remove('is-shifting');
+        void galleryTrack.offsetWidth;
+        galleryTrack.style.removeProperty('transition');
+        galleryTrack.dataset.moving = 'false';
+      };
+      if (direction < 0) {
+        galleryTrack.style.transition = 'none';
+        galleryTrack.prepend(galleryTrack.lastElementChild);
         galleryTrack.classList.add('is-shifting');
-        window.setTimeout(() => { galleryTrack.append(galleryTrack.firstElementChild); galleryTrack.classList.remove('is-shifting'); }, 650);
-      }, 3000);
+        void galleryTrack.offsetWidth;
+        galleryTrack.style.removeProperty('transition');
+        requestAnimationFrame(() => {
+          galleryTrack.classList.remove('is-shifting');
+          galleryTrack.addEventListener('transitionend', finish, { once: true });
+        });
+      } else {
+        galleryTrack.classList.add('is-shifting');
+        galleryTrack.addEventListener('transitionend', finish, { once: true });
+      }
+    };
+    if (canMove && !galleryTrack.dataset.started) {
+      galleryTrack.dataset.started = 'true';
+      galleryPrev.addEventListener('click', () => moveGallery(-1));
+      galleryNext.addEventListener('click', () => moveGallery(1));
+      window.setInterval(() => moveGallery(1), 3000);
     }
   }
   const email = document.querySelector('#contactEmail');
