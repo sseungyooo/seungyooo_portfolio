@@ -95,7 +95,11 @@ homeGrid.addEventListener('wheel', event => {
   const maxScroll = homeGrid.scrollWidth - homeGrid.clientWidth;
   const isAtStart = homeGrid.scrollLeft <= 1 && event.deltaY < 0;
   const isAtEnd = homeGrid.scrollLeft >= maxScroll - 1 && event.deltaY > 0;
-  if (isAtStart || isAtEnd) return;
+  if (isAtStart || isAtEnd) {
+    event.preventDefault();
+    window.scrollBy({ top: event.deltaY, behavior: 'smooth' });
+    return;
+  }
   event.preventDefault();
   homeGrid.scrollBy({ left: event.deltaY * 0.65, behavior: 'smooth' });
 }, { passive: false });
