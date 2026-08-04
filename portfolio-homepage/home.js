@@ -18,7 +18,7 @@ function render(content) {
   const heroSize = Number(content.heroSize) || 66;
 const aboutSize = Number(content.aboutSize) || 48;
   
-document.documentElement.style.setProperty('--hero-size',`clamp(36px, calc(${heroSize} / 1920 * 100vw), ${heroSize}px)`); 
+document.documentElement.style.setProperty('--hero-size',`clamp(32px, calc(${heroSize} / 1920 * 100vw), ${heroSize}px)`); 
 document.documentElement.style.setProperty('--about-size',`clamp(28px, calc(${aboutSize} / 1920 * 100vw), ${aboutSize}px)`);
 document.documentElement.style.setProperty('--hero-bg', content.heroBg || '#fefefe');
 document.documentElement.style.setProperty('--contact-bg', content.contactBg || '#171714');
