@@ -20,15 +20,19 @@ function render(content) {
   document.documentElement.style.setProperty('--hero-bg', content.heroBg || '#fefefe');
   document.documentElement.style.setProperty('--contact-bg', content.contactBg || '#171714');
   const hero = document.querySelector('.hero');
-  if (hero) {
+  const heroImage = document.querySelector('#heroImage');
+  if (hero && heroImage) {
     if (content.heroImage) {
-      const heroUrl = 'url("' + content.heroImage + '")';
-      hero.style.setProperty('--hero-image', heroUrl);
-      hero.style.backgroundImage = heroUrl;
+      heroImage.src = content.heroImage;
+      heroImage.hidden = false;
+      hero.style.removeProperty('background-image');
+      hero.style.removeProperty('--hero-image');
       hero.classList.add('has-hero-image');
     } else {
-      hero.style.removeProperty('--hero-image');
+      heroImage.removeAttribute('src');
+      heroImage.hidden = true;
       hero.style.removeProperty('background-image');
+      hero.style.removeProperty('--hero-image');
       hero.classList.remove('has-hero-image');
     }
   }
