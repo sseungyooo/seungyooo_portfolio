@@ -1,180 +1,28 @@
 import { supabase } from './supabase-config.js';
 
-const defaults = {
-  heroTitle: '관찰하고,\n더 나은 경험을\n만듭니다.',
-  heroIntro: '디지털 제품과 브랜드에\n명료한 방향을 더하는 디자이너입니다.',
-  aboutTitle: '생각의 빈틈을\n형태로 채웁니다.',
-  aboutText:
-    '서울을 기반으로 활동하며, 브랜드의 본질을 발견하고 사람들이 자연스럽게 머무는 경험을 설계합니다.',
-  aboutKeywords:
-    'BRAND DESIGN, DIGITAL PRODUCT, ART DIRECTION',
-  heroSize: '100',
-  aboutSize: '62',
-  heroBg: '#f2f0ea',
-  contactBg: '#171714',
-  email: 'hello@example.com',
-
-  projectTitle0: 'Ovoid / Wellness',
-  projectDetail0: 'Brand identity · 2025',
-  projectDesc0:
-    '웰니스 브랜드를 위한 통합 브랜드 아이덴티티 프로젝트입니다.',
-
-  projectTitle1: 'Juun / Editorial',
-  projectDetail1: 'Art direction · 2025',
-  projectDesc1:
-    '패션과 라이프스타일을 위한 에디토리얼 아트 디렉션입니다.',
-
-  projectTitle2: 'Objects in form',
-  projectDetail2: 'Digital experience · 2024',
-  projectDesc2:
-    '사물의 형태와 질감을 탐구한 디지털 경험 프로젝트입니다.',
-
-  projectTitle3: 'Visual system',
-  projectDetail3: 'Brand experience · 2024',
-  projectDesc3:
-    '브랜드의 시각 시스템을 설계한 프로젝트입니다.',
-
-  projectTitle4: 'Archive edition',
-  projectDetail4: 'Editorial design · 2024',
-  projectDesc4:
-    '아카이브를 새로운 편집 방식으로 구성했습니다.',
-
-  projectTitle5: 'New object',
-  projectDetail5: 'Digital product · 2024',
-  projectDesc5:
-    '새로운 디지털 제품 경험을 담은 프로젝트입니다.'
-};
-
-const login = document.querySelector('#login');
-const dashboard = document.querySelector('#dashboard');
-const notice = document.querySelector('#notice');
-
-let imageUrls = {};
-
-/* 이미지 자동 압축 및 WebP 변환 */
-async function compressImage(
-  file,
-  maxSize = 1600,
-  quality = 0.8
-) {
-  if (!file.type.startsWith('image/')) {
-    throw new Error('이미지 파일만 업로드할 수 있습니다.');
-  }
-
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    const objectUrl = URL.createObjectURL(file);
-
-    image.onload = () => {
-      let width = image.naturalWidth;
-      let height = image.naturalHeight;
-
-      if (!width || !height) {
-        URL.revokeObjectURL(objectUrl);
-        reject(new Error('이미지 크기를 확인할 수 없습니다.'));
-        return;
-      }
-
-      if (width > maxSize || height > maxSize) {
-        const scale = Math.min(
-          maxSize / width,
-          maxSize / height
-        );
-
-        width = Math.round(width * scale);
-        height = Math.round(height * scale);
-      }
-
-      const canvas = document.createElement('canvas');
-
-      canvas.width = width;
-      canvas.height = height;
-
-      const context = canvas.getContext('2d');
-
-      if (!context) {
-        URL.revokeObjectURL(objectUrl);
-        reject(
-          new Error('이미지 압축 기능을 사용할 수 없습니다.')
-        );
-        return;
-      }
-
-      /*
-       * 투명 PNG를 WebP로 변환할 때도
-       * 투명 배경을 그대로 유지합니다.
-       */
-      context.drawImage(image, 0, 0, width, height);
-
-      canvas.toBlob(
-        blob => {
-          URL.revokeObjectURL(objectUrl);
-
-          if (!blob) {
-            reject(new Error('이미지 압축에 실패했습니다.'));
-            return;
-          }
-
-          const originalName = file.name.replace(
-            /\.[^/.]+$/,
-            ''
-          );
-
-          const safeName = originalName
-            .replace(/[^a-zA-Z0-9_-]/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-|-$/g, '');
-
-          const compressedFile = new File(
-            [blob],
-            `${safeName || 'image'}.webp`,
-            {
-              type: 'image/webp',
-              lastModified: Date.now()
-            }
-          );
-
-          resolve(compressedFile);
-        },
-        'image/webp',
-        quality
-      );
-    };
-
-    image.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-
-      reject(
-        new Error('선택한 이미지를 불러올 수 없습니다.')
-      );
-    };
-
-    image.src = objectUrl;
-  });
-}
-
-/* Supabase 이미지 업로드 */
-async function uploadCompressedImage(
-  originalFile,
-  folder
-) {
-  const compressedFile = await compressImage(
-    originalFile,
-    1600,
-    0.8
-  );
-
-  const safeFileName = compressedFile.name.replace(
-    /[^a-zA-Z0-9._-]/g,
-    '-'
-  );
-
-  const path =
-    `${folder}/${Date.now()}-${safeFileName}`;
-
-  const { error } = await supabase.storage
-    .from('portfolio-images')
-    .upload(path, compressedFile, {
-      upsert: false,
-      contentType: 'image/webp',
-      cacheControl: '3600'
+const defaults={heroTitle:'관찰하고,\n더 나은 경험을\n만듭니다.',heroIntro:'디지털 제품과 브랜드에\n명료한 방향을 더하는 디자이너입니다.',aboutTitle:'생각의 빈틈을\n형태로 채웁니다.',aboutText:'서울을 기반으로 활동하며, 브랜드의 본질을 발견하고 사람들이 자연스럽게 머무는 경험을 설계합니다.',aboutKeywords:'BRAND DESIGN, DIGITAL PRODUCT, ART DIRECTION',heroSize:'100',aboutSize:'62',heroBg:'#f2f0ea',contactBg:'#171714',email:'hello@example.com',projectTitle0:'Ovoid / Wellness',projectDetail0:'Brand identity · 2025',projectDesc0:'웰니스 브랜드를 위한 통합 브랜드 아이덴티티 프로젝트입니다.',projectTitle1:'Juun / Editorial',projectDetail1:'Art direction · 2025',projectDesc1:'패션과 라이프스타일을 위한 에디토리얼 아트 디렉션입니다.',projectTitle2:'Objects in form',projectDetail2:'Digital experience · 2024',projectDesc2:'사물의 형태와 질감을 탐구한 디지털 경험 프로젝트입니다.',projectTitle3:'Visual system',projectDetail3:'Brand experience · 2024',projectDesc3:'브랜드의 시각 시스템을 설계한 프로젝트입니다.',projectTitle4:'Archive edition',projectDetail4:'Editorial design · 2024',projectDesc4:'아카이브를 새로운 편집 방식으로 구성했습니다.',projectTitle5:'New object',projectDetail5:'Digital product · 2024',projectDesc5:'새로운 디지털 제품 경험을 담은 프로젝트입니다.'};
+const login=document.querySelector('#login'),dashboard=document.querySelector('#dashboard'),notice=document.querySelector('#notice');let imageUrls={};
+function updateRanges(){['heroSize','aboutSize'].forEach(key=>document.querySelector('#'+key+'Value').textContent=document.querySelector(`[name="${key}"]`).value+'px')}
+async function loadContent(){const {data,error}=await supabase.from('site_content').select('content').eq('id','main').single();if(error)throw error;const content={...defaults,...data.content};Object.entries(defaults).forEach(([key])=>{const input=document.querySelector(`[name="${key}"]`);if(input)input.value=content[key]});imageUrls=Object.fromEntries(Object.entries(content).filter(([key])=>key.startsWith('projectImage')||key.startsWith('aboutGalleryImage')||key==='heroImage'||key==='aboutImage'));updateRanges()}
+async function showDashboard(){login.hidden=true;dashboard.hidden=false;try{await loadContent()}catch(error){notice.textContent='데이터를 불러올 수 없습니다. 설정 SQL을 실행했는지 확인하세요.';console.error(error)}}
+const {data:{session}}=await supabase.auth.getSession();if(session)showDashboard();
+document.querySelector('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const button=e.currentTarget.querySelector('button');button.disabled=true;button.textContent='로그인 중…';const {error}=await supabase.auth.signInWithPassword({email:document.querySelector('#email').value,password:document.querySelector('#password').value});button.disabled=false;button.textContent='로그인 →';if(error){alert('이메일 또는 비밀번호를 확인해 주세요.')}else showDashboard()});
+document.querySelectorAll('.range').forEach(input=>input.addEventListener('input',updateRanges));
+document.querySelectorAll('.image-input').forEach(input=>input.addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;if(file.size>3*1024*1024){alert('3MB 이하의 이미지를 선택해 주세요.');e.target.value='';return}notice.textContent='이미지를 준비 중입니다…';const index=e.target.dataset.index;const path=`project-${index}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;const {error}=await supabase.storage.from('portfolio-images').upload(path,file,{upsert:false});if(error){notice.textContent='이미지 업로드에 실패했습니다.';return}const {data}=supabase.storage.from('portfolio-images').getPublicUrl(path);imageUrls['projectImage'+index]=data.publicUrl;notice.textContent='이미지가 업로드되었습니다. 저장 버튼을 눌러 반영하세요.'}));
+document.querySelector('#heroImageInput')?.addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;if(file.size>3*1024*1024){alert('3MB 이하의 이미지를 선택해 주세요.');e.target.value='';return}notice.textContent='메인 이미지를 업로드 중입니다…';const path=`hero/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;const {error}=await supabase.storage.from('portfolio-images').upload(path,file,{upsert:false});if(error){notice.textContent='이미지 업로드에 실패했습니다.';return}const {data}=supabase.storage.from('portfolio-images').getPublicUrl(path);imageUrls.heroImage=data.publicUrl;const {data:existing}=await supabase.from('site_content').select('content').eq('id','main').maybeSingle();const formValues=Object.fromEntries(new FormData(document.querySelector('#settingsForm')));const {error:saveError}=await supabase.from('site_content').upsert({id:'main',content:{...defaults,...(existing?.content||{}),...formValues,...imageUrls},updated_at:new Date().toISOString()});notice.textContent=saveError?'메인 이미지는 업로드되었지만 저장에 실패했습니다. 변경사항 저장하기를 다시 눌러주세요.':'메인 이미지가 저장되어 홈페이지에 바로 반영됩니다.'});
+document.querySelector('#aboutImageInput')?.addEventListener('change',async e=>{
+const file=e.target.files[0];if(!file)return;if(file.size>3*1024*1024){alert('3MB 이하의 이미지를 선택해 주세요.');e.target.value='';return}
+notice.textContent='소개 이미지를 업로드 중입니다…';const path='about/'+Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'-');
+const {error}=await supabase.storage.from('portfolio-images').upload(path,file,{upsert:false});if(error){notice.textContent='이미지 업로드에 실패했습니다.';return}
+const {data}=supabase.storage.from('portfolio-images').getPublicUrl(path);imageUrls.aboutImage=data.publicUrl;notice.textContent='소개 이미지가 업로드되었습니다. 변경사항 저장하기를 누르면 홈페이지에 반영됩니다.'});
+document.querySelector('#removeAboutImage')?.addEventListener('click',()=>{delete imageUrls.aboutImage;document.querySelector('#aboutImageInput').value='';notice.textContent='변경사항 저장하기를 누르면 소개 이미지가 제거됩니다.'});
+document.querySelector('#removeHeroImage')?.addEventListener('click',()=>{delete imageUrls.heroImage;document.querySelector('#heroImageInput').value='';notice.textContent='변경사항 저장하기를 누르면 메인 이미지가 제거됩니다.'});
+document.querySelectorAll('.remove-project-image').forEach(button=>button.addEventListener('click',()=>{delete imageUrls['projectImage'+button.dataset.index];document.querySelector(`.image-input[data-index="${button.dataset.index}"]`).value='';notice.textContent='저장 버튼을 누르면 기본 이미지로 돌아갑니다.'}));
+document.querySelector('#settingsForm').addEventListener('submit',async e=>{try{const formData=Object.fromEntries(new FormData(e.currentTarget));localStorage.setItem('site_content_main',JSON.stringify({...formData,...imageUrls}))}catch(err){}e.preventDefault();notice.textContent='저장 중…';const content={...Object.fromEntries(new FormData(e.currentTarget)),...imageUrls};const {error}=await supabase.from('site_content').upsert({id:'main',content,updated_at:new Date().toISOString()});notice.textContent=error?'저장에 실패했습니다.':'저장되었습니다. 홈페이지를 새로고침해 확인하세요.'});
+document.querySelectorAll('.about-gallery-input').forEach(input=>input.addEventListener('change',async e=>{
+const file=e.target.files[0];if(!file)return;if(file.size>3*1024*1024){alert('3MB 이하의 이미지를 선택해 주세요.');e.target.value='';return}
+notice.textContent='슬라이드 이미지를 업로드 중입니다…';const index=e.target.dataset.index;const path='about-gallery/'+index+'/'+Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'-');
+const {error}=await supabase.storage.from('portfolio-images').upload(path,file,{upsert:false});if(error){notice.textContent='이미지 업로드에 실패했습니다.';return}
+const {data}=supabase.storage.from('portfolio-images').getPublicUrl(path);imageUrls['aboutGalleryImage'+index]=data.publicUrl;notice.textContent='슬라이드 이미지가 업로드되었습니다. 변경사항 저장하기를 누르면 홈페이지에 반영됩니다.';}));
+document.querySelectorAll('.remove-about-gallery-image').forEach(button=>button.addEventListener('click',()=>{const index=button.dataset.index;delete imageUrls['aboutGalleryImage'+index];document.querySelector('.about-gallery-input[data-index="'+index+'"]').value='';notice.textContent='변경사항 저장하기를 누르면 슬라이드 이미지가 제거됩니다.';}));
+document.querySelector('#logout').addEventListener('click',async()=>{await supabase.auth.signOut();location.reload()});
