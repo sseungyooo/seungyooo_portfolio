@@ -21,8 +21,16 @@ function render(content) {
   document.documentElement.style.setProperty('--contact-bg', content.contactBg || '#171714');
   const hero = document.querySelector('.hero');
   if (hero) {
-    if (content.heroImage) { hero.style.setProperty('--hero-image', `url("${content.heroImage}")`); hero.classList.add('has-hero-image'); }
-    else { hero.style.removeProperty('--hero-image'); hero.classList.remove('has-hero-image'); }
+    if (content.heroImage) {
+      const heroUrl = 'url("' + content.heroImage + '")';
+      hero.style.setProperty('--hero-image', heroUrl);
+      hero.style.backgroundImage = heroUrl;
+      hero.classList.add('has-hero-image');
+    } else {
+      hero.style.removeProperty('--hero-image');
+      hero.style.removeProperty('background-image');
+      hero.classList.remove('has-hero-image');
+    }
   }
   const keywords = document.querySelector('#aboutKeywords');
   if (keywords && content.aboutKeywords) keywords.innerHTML = content.aboutKeywords.split(',').map(word => word.trim()).filter(Boolean).map(word => '<span>' + word.replace(/[&<>]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[char])) + '</span>').join('');
