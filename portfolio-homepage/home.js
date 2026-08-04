@@ -13,12 +13,11 @@ const colors = ['#ccb9f8','#fd7e58','#172426','#c9e7d4','#f6dfc5','#b7c5ff'];
 function render(content) {
   ['heroTitle','heroIntro','aboutTitle','aboutText'].forEach(key => {
     const el = document.querySelector(`#${key}`);
-    if (el && content[key]) el.innerHTML = content[key].split('\n').join('<br>');
-  });
-  const heroSize = Number(content.heroSize) || 66;
+    if (el && content[key]) el.innerHTML = content[key].split('\n').join('<br>');});
+const heroSize = Number(content.heroSize) || 66;
 const aboutSize = Number(content.aboutSize) || 48;
   
-document.documentElement.style.setProperty('--hero-size',`clamp(32px, calc(${heroSize} / 1920 * 100vw), ${heroSize}px)`); 
+document.documentElement.style.setProperty('--hero-size',`clamp(36px, calc(${heroSize} / 1920 * 100vw), ${heroSize}px)`); 
 document.documentElement.style.setProperty('--about-size',`clamp(28px, calc(${aboutSize} / 1920 * 100vw), ${aboutSize}px)`);
 document.documentElement.style.setProperty('--hero-bg', content.heroBg || '#fefefe');
 document.documentElement.style.setProperty('--contact-bg', content.contactBg || '#171714');
