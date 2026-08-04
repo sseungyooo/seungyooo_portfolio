@@ -191,3 +191,6 @@
 
 /* Align About Me imagery on desktop */
 @media(min-width:761px){.about{align-items:end}}
+
+/* Portfolio Contents Size */
+#work #workGrid.work-grid .project-art{aspect-ratio:16/9 !important;}
