@@ -178,3 +178,7 @@
 
 /* Mobile hero breathing room */
 @media(max-width:760px){.hero{min-height:max(680px,calc(100svh - 64px));padding-bottom:150px}.hero-intro{margin-bottom:clamp(100px,16vh,220px)}.hero .hero-bottom{bottom:32px}}
+
+
+/* Align About Me imagery on desktop */
+@media(min-width:761px){.about{align-items:end}}
