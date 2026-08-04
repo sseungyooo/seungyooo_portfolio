@@ -15,10 +15,14 @@ function render(content) {
     const el = document.querySelector(`#${key}`);
     if (el && content[key]) el.innerHTML = content[key].split('\n').join('<br>');
   });
-  document.documentElement.style.setProperty('--hero-size', `${content.heroSize || 66}px`);
-  document.documentElement.style.setProperty('--about-size', `${content.aboutSize || 48}px`);
-  document.documentElement.style.setProperty('--hero-bg', content.heroBg || '#fefefe');
-  document.documentElement.style.setProperty('--contact-bg', content.contactBg || '#171714');
+  const heroSize = Number(content.heroSize) || 66;
+const aboutSize = Number(content.aboutSize) || 48;
+  
+document.documentElement.style.setProperty('--hero-size',`clamp(42px, calc(${heroSize} / 1920 * 100vw), ${heroSize}px)`); 
+document.documentElement.style.setProperty('--about-size',`clamp(32px, calc(${aboutSize} / 1920 * 100vw), ${aboutSize}px)`);
+document.documentElement.style.setProperty('--hero-bg', content.heroBg || '#fefefe');
+document.documentElement.style.setProperty('--contact-bg', content.contactBg || '#171714');
+ 
   const hero = document.querySelector('.hero');
   const heroImage = document.querySelector('#heroImage');
   if (hero && heroImage) {
