@@ -146,7 +146,7 @@
 .project-page #projectIndex{display:none}
 .project-page .back-project{display:inline-block}
 
-.project-page>h1{font-size:clamp(36px,3.8vw,58px);
+.project-page>h1{font-size:clamp(28px,3.8vw,58px);
                  line-height:1.08;
                  letter-spacing:0.0em;
                  margin:0 0 20px;
@@ -156,7 +156,7 @@
 .project-page-copy>p:last-child{font-size:14px;line-height:1.7;margin:12px 0 0}
 .project-page-image{aspect-ratio:16/9;margin:0;width:100%}
 @media(max-width:680px){.project-page{padding:42px 22px 72px}
-                        .project-page>h1{font-size:36px}
+                        .project-page>h1{font-size:18px}
                         .project-page-detail{margin-bottom:46px}
                         .project-page-image{aspect-ratio:1/1}}
 
