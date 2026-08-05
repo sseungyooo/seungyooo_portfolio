@@ -13,6 +13,6 @@ const index=Math.min(5,Math.max(0,Number(new URLSearchParams(location.search).ge
 function render(content){document.querySelector('#projectIndex').textContent=`PROJECT ${String(index+1).padStart(2,'0')}`;document.querySelector('#projectPageTitle')
   .textContent=content[`projectTitle${index}`];document.querySelector('#projectPageDetail').textContent=content[`projectDetail${index}`];document.querySelector('#projectPageDesc')
   .textContent=content[`projectDesc${index}`]||'프로젝트 상세 소개를 준비 중입니다.';const image=content[`projectImage${index}`];document.querySelector('#projectPageImage')
-  .style.background=image?`center / cover no-repeat url('${image}')`:colors[index];}
+  .style.background=image?`center / cover no-repeat url('${image}')`:colors[index];const gallery=Array.isArray(content['projectGallery'+index])?content['projectGallery'+index]:[];document.querySelector('#projectPageGallery').innerHTML=gallery.map((src,imageIndex)=>'<img src="'+src+'" alt="'+content['projectTitle'+index]+' 상세 이미지 '+(imageIndex+1)+'">').join('');}
 render(defaults);const {data}=await supabase.from('site_content')
   .select('content').eq('id','main').maybeSingle();if(data?.content)render({...defaults,...data.content});
