@@ -1,6 +1,5 @@
 import { supabase } from './supabase-config.js';
-const defaults={projectTitle0:'Ovoid / Wellness',projectDetail0:'Brand identity · 2025',projectDesc0:'웰니스 브랜드를 위한 통합 브랜드 아이덴티티 프로젝트입니다.
-              ',projectTitle1:'Juun / Editorial',projectDetail1:'Art direction · 2025',projectDesc1:'패션과 라이프스타일을 위한 에디토리얼 아트 디렉션입니다.',
+const defaults={projectTitle0:'Ovoid / Wellness',projectDetail0:'Brand identity · 2025',projectDesc0:'웰니스 브랜드를 위한 통합 브랜드 아이덴티티 프로젝트입니다.',projectTitle1:'Juun / Editorial',projectDetail1:'Art direction · 2025',projectDesc1:'패션과 라이프스타일을 위한 에디토리얼 아트 디렉션입니다.',
                 projectTitle2:'Objects in form',projectDetail2:'Digital experience · 2024',
                 projectDesc2:'사물의 형태와 질감을 탐구한 디지털 경험 프로젝트입니다.',projectTitle3:'Visual system',              
                 projectDetail3:'Brand experience · 2024',projectDesc3:'브랜드의 시각 시스템을 설계한 프로젝트입니다.',                
