@@ -3,7 +3,7 @@ import { supabase } from './supabase-config.js';
 const defaults={heroTitle:'관찰하고,\n더 나은 경험을\n만듭니다.',heroIntro:'디지털 제품과 브랜드에\n명료한 방향을 더하는 디자이너입니다.',aboutTitle:'생각의 빈틈을\n형태로 채웁니다.',aboutText:'서울을 기반으로 활동하며, 브랜드의 본질을 발견하고 사람들이 자연스럽게 머무는 경험을 설계합니다.',aboutKeywords:'BRAND DESIGN, DIGITAL PRODUCT, ART DIRECTION',heroSize:'100',aboutSize:'62',heroBg:'#f2f0ea',contactBg:'#171714',email:'hello@example.com',projectTitle0:'Ovoid / Wellness',projectDetail0:'Brand identity · 2025',projectDesc0:'웰니스 브랜드를 위한 통합 브랜드 아이덴티티 프로젝트입니다.',projectTitle1:'Juun / Editorial',projectDetail1:'Art direction · 2025',projectDesc1:'패션과 라이프스타일을 위한 에디토리얼 아트 디렉션입니다.',projectTitle2:'Objects in form',projectDetail2:'Digital experience · 2024',projectDesc2:'사물의 형태와 질감을 탐구한 디지털 경험 프로젝트입니다.',projectTitle3:'Visual system',projectDetail3:'Brand experience · 2024',projectDesc3:'브랜드의 시각 시스템을 설계한 프로젝트입니다.',projectTitle4:'Archive edition',projectDetail4:'Editorial design · 2024',projectDesc4:'아카이브를 새로운 편집 방식으로 구성했습니다.',projectTitle5:'New object',projectDetail5:'Digital product · 2024',projectDesc5:'새로운 디지털 제품 경험을 담은 프로젝트입니다.'};
 const login=document.querySelector('#login'),dashboard=document.querySelector('#dashboard'),notice=document.querySelector('#notice');let imageUrls={};
 function updateRanges(){['heroSize','aboutSize'].forEach(key=>document.querySelector('#'+key+'Value').textContent=document.querySelector(`[name="${key}"]`).value+'px')}
-async function loadContent(){const {data,error}=await supabase.from('site_content').select('content').eq('id','main').single();if(error)throw error;const content={...defaults,...data.content};Object.entries(defaults).forEach(([key])=>{const input=document.querySelector(`[name="${key}"]`);if(input)input.value=content[key]});imageUrls=Object.fromEntries(Object.entries(content).filter(([key])=>key.startsWith('projectImage')||key.startsWith('aboutGalleryImage')||key==='heroImage'||key==='aboutImage'));updateRanges()}
+async function loadContent(){const {data,error}=await supabase.from('site_content').select('content').eq('id','main').single();if(error)throw error;const content={...defaults,...data.content};Object.entries(defaults).forEach(([key])=>{const input=document.querySelector(`[name="${key}"]`);if(input)input.value=content[key]});imageUrls=Object.fromEntries(Object.entries(content).filter(([key])=>key.startsWith('projectImage')||key.startsWith('projectGallery')||key.startsWith('aboutGalleryImage')||key==='heroImage'||key==='aboutImage'));updateRanges()}
 async function showDashboard(){login.hidden=true;dashboard.hidden=false;try{await loadContent()}catch(error){notice.textContent='데이터를 불러올 수 없습니다. 설정 SQL을 실행했는지 확인하세요.';console.error(error)}}
 const {data:{session}}=await supabase.auth.getSession();if(session)showDashboard();
 document.querySelector('#loginForm').addEventListener('submit',async e=>{e.preventDefault();const button=e.currentTarget.querySelector('button');button.disabled=true;button.textContent='로그인 중…';const {error}=await supabase.auth.signInWithPassword({email:document.querySelector('#email').value,password:document.querySelector('#password').value});button.disabled=false;button.textContent='로그인 →';if(error){alert('이메일 또는 비밀번호를 확인해 주세요.')}else showDashboard()});
@@ -25,4 +25,44 @@ notice.textContent='슬라이드 이미지를 업로드 중입니다…';const i
 const {error}=await supabase.storage.from('portfolio-images').upload(path,file,{upsert:false});if(error){notice.textContent='이미지 업로드에 실패했습니다.';return}
 const {data}=supabase.storage.from('portfolio-images').getPublicUrl(path);imageUrls['aboutGalleryImage'+index]=data.publicUrl;notice.textContent='슬라이드 이미지가 업로드되었습니다. 변경사항 저장하기를 누르면 홈페이지에 반영됩니다.';}));
 document.querySelectorAll('.remove-about-gallery-image').forEach(button=>button.addEventListener('click',()=>{const index=button.dataset.index;delete imageUrls['aboutGalleryImage'+index];document.querySelector('.about-gallery-input[data-index="'+index+'"]').value='';notice.textContent='변경사항 저장하기를 누르면 슬라이드 이미지가 제거됩니다.';}));
+
+const projectDetailManager=document.querySelector('.projects');
+projectDetailManager?.querySelectorAll('fieldset').forEach((fieldset,index)=>{
+  if(fieldset.querySelector('.project-gallery-input'))return;
+  const label=document.createElement('label');
+  label.innerHTML='상세 페이지 이미지 <small>여러 장을 선택할 수 있습니다.</small><input class="project-gallery-input" data-index="'+index+'" type="file" accept="image/*" multiple>';
+  const remove=document.createElement('button');
+  remove.className='remove-project-gallery';
+  remove.dataset.index=index;
+  remove.type='button';
+  remove.textContent='상세 이미지 전체 제거';
+  fieldset.append(label,remove);
+});
+projectDetailManager?.addEventListener('change',async event=>{
+  const input=event.target;
+  if(!input.matches('.project-gallery-input'))return;
+  const files=Array.from(input.files||[]);
+  if(!files.length)return;
+  if(files.some(file=>file.size>3*1024*1024)){alert('각 이미지는 3MB 이하로 선택해 주세요.');input.value='';return}
+  notice.textContent='상세 이미지를 업로드 중입니다…';
+  const index=input.dataset.index;
+  const uploaded=await Promise.all(files.map(async file=>{
+    const path='project-gallery/'+index+'/'+Date.now()+'-'+file.name.replace(/[^a-zA-Z0-9._-]/g,'-');
+    const {error}=await supabase.storage.from('portfolio-images').upload(path,file,{upsert:false});
+    if(error)throw error;
+    return supabase.storage.from('portfolio-images').getPublicUrl(path).data.publicUrl;
+  })).catch(()=>null);
+  if(!uploaded){notice.textContent='상세 이미지 업로드에 실패했습니다.';return}
+  imageUrls['projectGallery'+index]=[...(imageUrls['projectGallery'+index]||[]),...uploaded];
+  notice.textContent=uploaded.length+'장의 상세 이미지가 업로드되었습니다. 변경사항 저장하기를 누르면 홈페이지에 반영됩니다.';
+});
+projectDetailManager?.addEventListener('click',event=>{
+  const button=event.target.closest('.remove-project-gallery');
+  if(!button)return;
+  const index=button.dataset.index;
+  delete imageUrls['projectGallery'+index];
+  const input=projectDetailManager.querySelector('.project-gallery-input[data-index="'+index+'"]');
+  if(input)input.value='';
+  notice.textContent='변경사항 저장하기를 누르면 상세 이미지가 제거됩니다.';
+});
 document.querySelector('#logout').addEventListener('click',async()=>{await supabase.auth.signOut();location.reload()});
