@@ -13,10 +13,10 @@ async function renderProjectGallery(gallery){
   const request=++galleryRequest;
   let images=gallery;
   if(!images.length){
-    const {data,error}=await supabase.storage.from('portfolio-images').list('project-gallery/'+index,{limit:100,sortBy:{column:'name',order:'asc'}});
+    const [galleryResult,thumbnailResult]=await Promise.all([supabase.storage.from('portfolio-images').list('project-gallery/'+index,{limit:100,sortBy:{column:'name',order:'asc'}}),supabase.storage.from('portfolio-images').list('project-'+index,{limit:100,sortBy:{column:'name',order:'asc'}})]);const {data,error}=galleryResult;const thumbnailEtags=new Set((thumbnailResult.data||[]).map(item=>item.metadata?.eTag).filter(Boolean));
     if(error||request!==galleryRequest)return;
     const unique=new Map();
-    (data||[]).filter(item=>item.name).forEach(item=>unique.set(item.metadata?.eTag||item.name,item));
+    (data||[]).filter(item=>item.name&&!thumbnailEtags.has(item.metadata?.eTag)).forEach(item=>unique.set(item.metadata?.eTag||item.name,item));
     images=[...unique.values()].map(item=>supabase.storage.from('portfolio-images').getPublicUrl('project-gallery/'+index+'/'+item.name).data.publicUrl);
   }
   if(request!==galleryRequest)return;
