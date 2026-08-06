@@ -8,11 +8,25 @@ const defaults={projectTitle0:'Ovoid / Wellness',projectDetail0:'Brand identity 
 
 const index=Math.min(5,Math.max(0,Number(new URLSearchParams(location.search)
                                          .get('project'))||0));const colors=['#ccb9f8','#fd7e58','#172426','#c9e7d4','#f6dfc5','#b7c5ff'];
+let galleryRequest=0;
+async function renderProjectGallery(gallery){
+  const request=++galleryRequest;
+  let images=gallery;
+  if(!images.length){
+    const {data,error}=await supabase.storage.from('portfolio-images').list('project-gallery/'+index,{limit:100,sortBy:{column:'name',order:'asc'}});
+    if(error||request!==galleryRequest)return;
+    const unique=new Map();
+    (data||[]).filter(item=>item.name).forEach(item=>unique.set(item.metadata?.eTag||item.name,item));
+    images=[...unique.values()].map(item=>supabase.storage.from('portfolio-images').getPublicUrl('project-gallery/'+index+'/'+item.name).data.publicUrl);
+  }
+  if(request!==galleryRequest)return;
+  document.querySelector('#projectPageGallery').innerHTML=images.map((src,imageIndex)=>'<img src="'+src+'" alt="'+document.querySelector('#projectPageTitle').textContent+' 상세 이미지 '+(imageIndex+1)+'">').join('');
+}
+
 function render(content){document.querySelector('#projectIndex')
   .textContent=`PROJECT ${String(index+1)
   .padStart(2,'0')}`;document.querySelector('#projectPageTitle')
   .textContent=content[`projectTitle${index}`];document.querySelector('#projectPageDetail').textContent=content[`projectDetail${index}`];document.querySelector('#projectPageDesc')
   .textContent=content[`projectDesc${index}`]||'프로젝트 상세 소개를 준비 중입니다.';const image=content[`projectImage${index}`];document.querySelector('#projectPageImage')
-  .style.background=image?`center / cover no-repeat url('${image}')`:colors[index];const gallery=Array.isArray(content['projectGallery'+index])?content['projectGallery'+index]:[];document.querySelector('#projectPageGallery').innerHTML=gallery.map((src,imageIndex)=>'<img src="'+src+'" alt="'+content['projectTitle'+index]+' 상세 이미지 '+(imageIndex+1)+'">').join('');}
-render(defaults);const {data}=await supabase.from('site_content')
+  .style.background=image?`center / cover no-repeat url('${image}')`:colors[index];const gallery=Array.isArray(content['projectGallery'+index])?content['projectGallery'+index]:[];renderProjectGallery(gallery);}render(defaults);const {data}=await supabase.from('site_content')
   .select('content').eq('id','main').maybeSingle();if(data?.content)render({...defaults,...data.content});
