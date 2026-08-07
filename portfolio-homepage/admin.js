@@ -224,7 +224,8 @@ async function uploadCompressedImage(
 /* 여러 이미지 압축 및 업로드 */
 async function uploadMultipleImages(
   files,
-  folder
+  folder,
+  options = {}
 ) {
   const results = [];
 
@@ -238,7 +239,8 @@ async function uploadMultipleImages(
 
     const result = await uploadCompressedImage(
       files[index],
-      folder
+      folder,
+      options
     );
 
     results.push(result);
@@ -398,7 +400,8 @@ document
 
         const result = await uploadCompressedImage(
           originalFile,
-          `project-${index}`
+          `project-${index}`,
+          { maxSize: 2560, quality: 0.95 }
         );
 
         imageUrls[`projectImage${index}`] =
@@ -714,7 +717,8 @@ projectDetailManager?.addEventListener(
     try {
       const results = await uploadMultipleImages(
         files,
-        `project-gallery/${index}`
+        `project-gallery/${index}`,
+        { maxSize: 2560, quality: 0.95 }
       );
 
       const uploadedUrls = results.map(
