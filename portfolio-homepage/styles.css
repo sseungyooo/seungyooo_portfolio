@@ -238,3 +238,10 @@
 
 /* Align project details with project images */
 @media(min-width:681px){.project-page>.back-project,.project-page>h1,.project-page>.project-page-detail,.project-page>.project-page-copy{width:min(1200px,calc(100vw - 56px));margin-left:50%;margin-right:0;transform:translateX(-50%)}.project-page>.project-page-copy{max-width:none}}
+
+
+/* Project image modal */
+.project-page-image,#projectPageGallery img{cursor:zoom-in}
+.image-modal{position:fixed;inset:0;z-index:1000;display:none;place-items:center;padding:32px;background:rgba(0,0,0,.88)}
+.image-modal.is-open{display:grid}.image-modal img{display:block;max-width:calc(100vw - 64px);max-height:calc(100vh - 64px);object-fit:contain}.image-modal-close{position:absolute;top:18px;right:22px;border:0;background:transparent;color:#fff;font:400 42px/1 Arial;cursor:pointer}.image-modal-open{overflow:hidden}
+@media(max-width:680px){.image-modal{padding:18px}.image-modal img{max-width:calc(100vw - 36px);max-height:calc(100vh - 36px)}.image-modal-close{top:12px;right:14px}}
