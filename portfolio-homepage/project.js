@@ -23,10 +23,36 @@ async function renderProjectGallery(gallery){
   document.querySelector('#projectPageGallery').innerHTML=images.map((src,imageIndex)=>'<img src="'+src+'" alt="'+document.querySelector('#projectPageTitle').textContent+' 상세 이미지 '+(imageIndex+1)+'">').join('');
 }
 
+
+const imageModal=document.querySelector('#imageModal');
+const imageModalImage=document.querySelector('#imageModalImage');
+function openImageModal(src,alt){
+  if(!src||!imageModal||!imageModalImage)return;
+  imageModalImage.src=src;
+  imageModalImage.alt=alt||'확대 이미지';
+  imageModal.classList.add('is-open');
+  imageModal.setAttribute('aria-hidden','false');
+  document.body.classList.add('image-modal-open');
+}
+function closeImageModal(){
+  if(!imageModal)return;
+  imageModal.classList.remove('is-open');
+  imageModal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('image-modal-open');
+}
+document.addEventListener('click',event=>{
+  const galleryImage=event.target.closest('#projectPageGallery img');
+  const cover=event.target.closest('#projectPageImage');
+  if(galleryImage){openImageModal(galleryImage.currentSrc||galleryImage.src,galleryImage.alt);return}
+  if(cover?.dataset.imageSrc){openImageModal(cover.dataset.imageSrc,document.querySelector('#projectPageTitle').textContent);return}
+  if(event.target===imageModal||event.target.closest('.image-modal-close'))closeImageModal();
+});
+document.addEventListener('keydown',event=>{if(event.key==='Escape')closeImageModal()});
+
 function render(content){document.querySelector('#projectIndex')
   .textContent=`PROJECT ${String(index+1)
   .padStart(2,'0')}`;document.querySelector('#projectPageTitle')
   .textContent=content[`projectTitle${index}`];document.querySelector('#projectPageDetail').textContent=content[`projectDetail${index}`];document.querySelector('#projectPageDesc')
   .textContent=content[`projectDesc${index}`]||'프로젝트 상세 소개를 준비 중입니다.';const image=content[`projectImage${index}`];document.querySelector('#projectPageImage')
-  .style.background=image?`center / cover no-repeat url('${image}')`:colors[index];const gallery=Array.isArray(content['projectGallery'+index])?content['projectGallery'+index]:[];renderProjectGallery(gallery);}render(defaults);const {data}=await supabase.from('site_content')
+  .style.background=image?`center / cover no-repeat url('${image}')`:colors[index];document.querySelector('#projectPageImage').dataset.imageSrc=image||'';const gallery=Array.isArray(content['projectGallery'+index])?content['projectGallery'+index]:[];renderProjectGallery(gallery);}render(defaults);const {data}=await supabase.from('site_content')
   .select('content').eq('id','main').maybeSingle();if(data?.content)render({...defaults,...data.content});
