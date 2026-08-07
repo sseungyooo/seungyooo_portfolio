@@ -221,6 +221,44 @@ async function uploadCompressedImage(
   };
 }
 
+
+/* 포트폴리오 원본 이미지 업로드 */
+async function uploadOriginalImage(originalFile, folder) {
+  if (!originalFile.type.startsWith('image/')) {
+    throw new Error('이미지 파일만 업로드할 수 있습니다.');
+  }
+  const safeName = createSafeFileName(originalFile.name);
+  const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
+  const { error } = await supabase.storage
+    .from('portfolio-images')
+    .upload(path, originalFile, {
+      upsert: false,
+      contentType: originalFile.type,
+      cacheControl: '3600'
+    });
+  if (error) throw error;
+  const { data } = supabase.storage
+    .from('portfolio-images')
+    .getPublicUrl(path);
+  if (!data?.publicUrl) {
+    throw new Error('업로드된 이미지 주소를 생성하지 못했습니다.');
+  }
+  return {
+    publicUrl: data.publicUrl,
+    originalSize: originalFile.size,
+    compressedSize: originalFile.size
+  };
+}
+
+async function uploadOriginalImages(files, folder) {
+  const results = [];
+  for (let index = 0; index < files.length; index += 1) {
+    notice.textContent = `${files.length}장 중 ${index + 1}번째 원본 이미지를 업로드하고 있습니다…`;
+    results.push(await uploadOriginalImage(files[index], folder));
+  }
+  return results;
+}
+
 /* 여러 이미지 압축 및 업로드 */
 async function uploadMultipleImages(
   files,
@@ -396,12 +434,11 @@ document
 
       try {
         notice.textContent =
-          '프로젝트 썸네일을 압축하고 있습니다…';
+          '프로젝트 썸네일 원본을 업로드하고 있습니다…';
 
-        const result = await uploadCompressedImage(
+        const result = await uploadOriginalImage(
           originalFile,
-          `project-${index}`,
-          { maxSize: 2560, quality: 0.95 }
+          `project-${index}`
         );
 
         imageUrls[`projectImage${index}`] =
@@ -715,10 +752,9 @@ projectDetailManager?.addEventListener(
     const index = input.dataset.index;
 
     try {
-      const results = await uploadMultipleImages(
+      const results = await uploadOriginalImages(
         files,
-        `project-gallery/${index}`,
-        { maxSize: 2560, quality: 0.95 }
+        `project-gallery/${index}`
       );
 
       const uploadedUrls = results.map(
