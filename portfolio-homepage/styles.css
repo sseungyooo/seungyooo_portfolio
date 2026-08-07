@@ -234,3 +234,7 @@
 
 /* Portfolio 전체보기 페이지 썸네일 */
 .all-work-grid .project-art,#allWorkGrid .project-art {aspect-ratio: 16 / 9 !important;width: 100% !important;height: auto !important;}
+
+
+/* Align project details with project images */
+@media(min-width:681px){.project-page>.back-project,.project-page>h1,.project-page>.project-page-detail,.project-page>.project-page-copy{width:min(1200px,calc(100vw - 56px));margin-left:50%;margin-right:0;transform:translateX(-50%)}.project-page>.project-page-copy{max-width:none}}
